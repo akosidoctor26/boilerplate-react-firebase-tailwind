@@ -24,3 +24,7 @@ yarn-error.log*
 
 *.log
 tailwind.output.css
+
+#functions
+functions/emulate-data-qa
+functions/seed

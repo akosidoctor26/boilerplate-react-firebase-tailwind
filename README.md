@@ -1,3 +1,84 @@
+## How to Import Production Data Into the Local Emulator
+
+We’ll do all work in the terminal, so make sure to install the Google Cloud SDK (see how to) and theFirebase CLI (see how to) before we begin.
+
+1. Login to Firebase:
+
+```
+firebase login
+```
+
+2. See the list of your projects and connect to the one you’d like to export data from:
+
+```
+gcloud projects list
+gcloud config set project your-project-name
+```
+
+3. Export your production data to a Google Cloud Storage bucket, providing a name of your choice:
+
+```
+gcloud firestore export gs://your-project-name.appspot.com/your-choosen-folder-name
+```
+
+4. Now copy this folder to your local machine. I usually do this directly from my project’s functions folder:
+
+```cd functions
+gsutil -m cp -r gs://your-project-name.appspot.com/your-choosen-folder-name .
+```
+
+5. Now we just want to import this folder. Technically, this should work with the basic command firebase emulators:start — import ./your-choosen-folder-name, but for right now it will throw an error: Import/Export metadata file does not exist. Skipping data import! See issue ticket and workaround explanation here. So all we need to do is create a file named firebase-export-metadata.json using the following commands:
+
+```
+firebase emulators:start --only firestore
+firebase emulators:export seed
+```
+
+6. Now if you ran the previous command in your functions folder, you will see a folder named seed with a file named firebase-export-metadata.json. Let’s go ahead and modify the fields path and metadata_file name.
+   From:
+
+```
+{
+  "version": "X.X.X",
+  "firestore": {
+      "version": "X.XX.X",
+      "path": "firestore_export",
+      "metadata_file":     "firestore_export/firestore_export.overall_export_metadata"
+   }
+}
+```
+
+To:
+
+```
+{
+  "version": "X.X.X",
+  "firestore": {
+     "version": "X.XX.X",
+     "path": "your-choosen-folder-name",
+     "metadata_file": "your-choosen-folder-name.overall_export_metadata"
+   }
+}
+```
+
+7. Move firebase-export-metadata.json to your-choosen-folder-name:
+
+```
+cp seed/firebase-export-metadata.json your-choosen-folder-name
+```
+
+8. 😅 Finally we can run:
+
+```
+firebase emulators:start --import your-choosen-folder-name
+```
+
+P.S To learn more about the individual commands the gsutil and gcloud CLI tools provide, you can always run firebase — help .
+
+Full Guide here: https://medium.com/firebase-developers/how-to-import-production-data-from-cloud-firestore-to-the-local-emulator-e82ae1c6ed8
+
+---
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
