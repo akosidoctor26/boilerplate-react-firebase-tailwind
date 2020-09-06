@@ -15,7 +15,11 @@
   },
   "scripts": {
     "build:tailwind": "tailwindcss build src/styles/tailwind.css -o src/styles/tailwind.output.css",
-    "start": "react-scripts start",
+    "prestart": "npm run build:tailwind",
+    "start": "run-p --race start:firebase start:react",
+    "start:firebase": "firebase emulators:start --import ./functions/emulate-data-qa",
+    "start:react": "react-scripts start",
+    "prebuild": "npm run build:tailwind",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
